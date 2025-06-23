@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const router = require('./src/router')
 const {PORT,HOST,CORSORIGIN} = require("./core/config")
+const db = require('./core/db')
 
 const app = express();
 
@@ -15,6 +16,15 @@ app.use(cors({
 
 app.use('/', router)
 
-app.listen(PORT,HOST, ()=>{
-    console.log(`Server running at http://${HOST}:${PORT}`)
+db.raw('SELECT 1')
+.then(()=>{
+    console.log('Database connection successful!');
+    app.listen(PORT,HOST, ()=>{
+        console.log(`Server running at http://${HOST}:${PORT}`)
+    })
 })
+.catch((err) =>{
+    console.error("Database connection failed:",err.message);
+    process.exit(1);
+});
+

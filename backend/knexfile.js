@@ -1,47 +1,49 @@
-// Update with your config settings.
-
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
+const config = require('./core/config');
 module.exports = {
-
   development: {
-    client: 'sqlite3',
+    client: 'pg',
     connection: {
-      filename: './dev.sqlite3'
-    }
+      connectionString: config.DB_URI,
+      ssl: {
+        rejectUnauthorized: false, 
+      },
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+    },
   },
 
   staging: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
+      connectionString: config.DB_URI,
+      ssl: {
+        rejectUnauthorized: false, 
+      },
     },
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
-      tableName: 'knex_migrations'
-    }
+      tableName: 'knex_migrations',
+    },
   },
 
   production: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
+      connectionString: config.DB_URI,
+      ssl: {
+        rejectUnauthorized: false, 
+      },
     },
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
-      tableName: 'knex_migrations'
-    }
-  }
-
+      tableName: 'knex_migrations',
+    },
+  },
 };

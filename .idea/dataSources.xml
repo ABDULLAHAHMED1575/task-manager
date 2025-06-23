@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="taskmanager_3iih@dpg-d1cp7dripnbc73c1u6b0-a.oregon-postgres.render.com" uuid="b8d8047e-07ff-46f1-b717-d3c3bbac48ae">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://dpg-d1cp7dripnbc73c1u6b0-a.oregon-postgres.render.com:5432/taskmanager_3iih</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>
