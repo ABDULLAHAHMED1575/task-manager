@@ -9,7 +9,7 @@ module.exports = {
       },
     },
     migrations: {
-      tableName: 'knex_migrations',
+      tableName: 'taskmanager_3iih',
     },
   },
 
@@ -26,7 +26,7 @@ module.exports = {
       max: 10,
     },
     migrations: {
-      tableName: 'knex_migrations',
+      tableName: 'taskmanager_3iih',
     },
   },
 
@@ -43,7 +43,7 @@ module.exports = {
       max: 10,
     },
     migrations: {
-      tableName: 'knex_migrations',
+      tableName: 'taskmanager_3iih',
     },
   },
 };

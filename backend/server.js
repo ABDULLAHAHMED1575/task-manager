@@ -3,6 +3,7 @@ const cors = require('cors');
 const router = require('./src/router')
 const {PORT,HOST,CORSORIGIN} = require("./core/config")
 const db = require('./core/db')
+const {setupPassport} = require('./middleware/passportMiddleware')
 
 const app = express();
 
@@ -13,8 +14,10 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
-
-app.use('/', router)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+setupPassport(app);
+app.use('/', router);
 
 db.raw('SELECT 1')
 .then(()=>{
