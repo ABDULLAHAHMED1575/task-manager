@@ -62,32 +62,32 @@ class Team {
         return team;
     }
 
-        static async findByIdWithStats(id) {
-            const team = await db(this.tableName)
-                .select(
-                    'teams.*',
-                    db.raw('COUNT(DISTINCT memberships.user_id) as member_count'),
-                    db.raw('COUNT(DISTINCT tasks.id) as total_tasks'),
-                    db.raw('COUNT(DISTINCT CASE WHEN tasks.status = \'PENDING\' THEN tasks.id END) as pending_tasks'),
-                    db.raw('COUNT(DISTINCT CASE WHEN tasks.status = \'COMPLETED\' THEN tasks.id END) as completed_tasks')
-                )
-                .leftJoin('memberships', 'teams.id', 'memberships.team_id')
-                .leftJoin('tasks', 'teams.id', 'tasks.team_id')
-                .where('teams.id', id)
-                .groupBy('teams.id')
-                .first();
+    static async findByIdWithStats(id) {
+        const team = await db(this.tableName)
+            .select(
+                'teams.*',
+                db.raw('COUNT(DISTINCT memberships.user_id) as member_count'),
+                db.raw('COUNT(DISTINCT tasks.id) as total_tasks'),
+                db.raw('COUNT(DISTINCT CASE WHEN tasks.status = \'PENDING\' THEN tasks.id END) as pending_tasks'),
+                db.raw('COUNT(DISTINCT CASE WHEN tasks.status = \'COMPLETED\' THEN tasks.id END) as completed_tasks')
+            )
+            .leftJoin('memberships', 'teams.id', 'memberships.team_id')
+            .leftJoin('tasks', 'teams.id', 'tasks.team_id')
+            .where('teams.id', id)
+            .groupBy('teams.id')
+            .first();
 
-            if (team) {
-                team.member_count = parseInt(team.member_count) || 0;
-                team.total_tasks = parseInt(team.total_tasks) || 0;
-                team.pending_tasks = parseInt(team.pending_tasks) || 0;
-                team.completed_tasks = parseInt(team.completed_tasks) || 0;
-                team.completion_rate = team.total_tasks > 0 ? 
-                    Math.round((team.completed_tasks / team.total_tasks) * 100) : 0;
-            }
-
-            return team;
+        if (team) {
+            team.member_count = parseInt(team.member_count) || 0;
+            team.total_tasks = parseInt(team.total_tasks) || 0;
+            team.pending_tasks = parseInt(team.pending_tasks) || 0;
+            team.completed_tasks = parseInt(team.completed_tasks) || 0;
+            team.completion_rate = team.total_tasks > 0 ? 
+                Math.round((team.completed_tasks / team.total_tasks) * 100) : 0;
         }
+
+        return team;
+    }
 
     static async delete(id) {
         const result = await db(this.tableName)
