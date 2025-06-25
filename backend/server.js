@@ -22,8 +22,8 @@ app.use('/', router);
 db.raw('SELECT 1')
 .then(()=>{
     console.log('Database connection successful!');
-    app.listen(PORT,HOST, ()=>{
-        console.log(`Server running at http://${HOST}:${PORT}`)
+    app.listen(PORT, ()=>{
+        console.log(`Server running at http://localhost:${PORT}`)
     })
 })
 .catch((err) =>{
