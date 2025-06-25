@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from '@/context/AuthContext'
 import { ToastProvider } from '@/components/ui/toast'
 import Login from '@/pages/Login'
-// import Dashboard from '@/pages/Dashboard'
+import Dashboard from '@/pages/Dashboard'
 // import Teams from '@/pages/Teams'
 // import Tasks from '@/pages/Tasks'
 import Layout from '@/components/layout/MainLayout'
@@ -59,7 +59,7 @@ const AppRoutes = () => {
         } 
       />
       
-      {/* <Route 
+       <Route 
         path="/dashboard" 
         element={
           <ProtectedRoute>
@@ -67,7 +67,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
-      
+      {/*
       <Route 
         path="/teams" 
         element={
