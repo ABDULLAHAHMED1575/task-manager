@@ -10,11 +10,11 @@ const Login = () => {
   const navigate = useNavigate()
   const { isAuthenticated, loading } = useAuth()
 
-//   useEffect(() => {
-//     if (!loading && isAuthenticated) {
-//       navigate('/dashboard')
-//     }
-//   }, [isAuthenticated, loading, navigate])
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate('/dashboard')
+    }
+  }, [isAuthenticated, loading, navigate])
 
   const handleLoginSuccess = () => {
     navigate('/dashboard')
@@ -24,9 +24,9 @@ const Login = () => {
     navigate('/authRegister')
   }
 
-//   if (loading) {
-//     return <LoadingScreen text="Checking authentication..." />
-//   }
+  if (loading) {
+    return <LoadingScreen text="Checking authentication..." />
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

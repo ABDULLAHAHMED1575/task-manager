@@ -3,8 +3,8 @@ import { AuthProvider } from '@/context/AuthContext'
 import { ToastProvider } from '@/components/ui/toast'
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
-// import Teams from '@/pages/Teams'
-// import Tasks from '@/pages/Tasks'
+import Teams from '@/pages/Teams'
+import Tasks from '@/pages/Tasks'
 import Layout from '@/components/layout/MainLayout'
 import useAuth from '@/hooks/useAuth'
 import { LoadingScreen } from '@/components/ui/loading'
@@ -13,9 +13,9 @@ import Register from '@/pages/Register'
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth()
 
-  // if (loading) {
-  //   return <LoadingScreen text="Loading..." />
-  // }
+  if (loading) {
+    return <LoadingScreen text="Loading..." />
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
@@ -27,13 +27,13 @@ const ProtectedRoute = ({ children }) => {
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth()
 
-  // if (loading) {
-  //   return <LoadingScreen text="Loading..." />
-  // }
+  if (loading) {
+    return <LoadingScreen text="Loading..." />
+  }
 
-  // if (isAuthenticated) {
-  //   return <Navigate to="/dashboard" replace />
-  // }
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   return children
 }
@@ -67,7 +67,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
-      {/*
+      
       <Route 
         path="/teams" 
         element={
@@ -85,14 +85,13 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
- */}
+
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )
 }
 
-// Main App Component
 function App() {
   return (
     <Router>
