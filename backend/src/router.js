@@ -40,7 +40,7 @@ router.delete('/teams/:teamId/members/:userId', requireAuth, requireTeamAccess, 
 router.get('/teams/:teamId/tasks', requireAuth, requireTeamAccess, validateTeam.validateTeamId, teamController.getTeamTasks);
 router.get('/teams/:teamId/statistics', requireAuth, requireTeamAccess, validateTeam.validateTeamId, teamController.getTeamStatistics);
 
-// HEALTH CHECK
+
 router.get('/health', (req, res) => {
     res.json({ health: 'Check' });
 });
