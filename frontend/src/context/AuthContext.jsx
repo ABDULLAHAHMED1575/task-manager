@@ -20,7 +20,9 @@ export const AuthProvider = ({children}) => {
                 }
             }
         } catch (err) {
-            toast.error('Not authenticated')
+            console.error('Auth check failed: ',err);
+            localStorage.removeItem('user');
+            setUser(null);
         } finally {
             setLoading(false)
         }
