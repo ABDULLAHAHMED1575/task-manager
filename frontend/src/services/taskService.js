@@ -13,7 +13,7 @@ export const taskService =  {
     getMyTasks: async (filters = {}) => {
         try {
             const params = new URLSearchParams(filters);
-            const response = await api.get(`/tasks/my-tasks?${params}`);
+            const response = await api.get(`/tasks/my-tasks`);
             return response.data;
         } catch (error) {
             throw error;

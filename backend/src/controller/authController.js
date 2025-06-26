@@ -3,33 +3,48 @@ const config = require('../../core/config')
 const User = require('../models/user');
 const {body, validationResult} = require('express-validator');
 
-const register = async ( req,res,next) => {
-    try {
-        const errors = validationResult(req);
-        
-        if(!errors.isEmpty()){
-            return res.status(400).json({
-                error: 'Validation failed',
-                details: errors.array()
-            });
+const register = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: errors.array()
+      });
+    }
+
+    const { username, email, password } = req.body;
+
+    const user = await User.create({
+      username: username.trim(),
+      email: email.toLowerCase().trim(),
+      password
+    });
+
+    req.login(user, (error) => {
+      if (error) {
+        console.error('Session creation failed after registration:', error);
+        return res.status(201).json({
+          message: 'Registration successful',
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email
+          }
+        });
+      }
+      res.status(201).json({
+        message: 'Registration successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
         }
+      });
+    });
 
-        const {username, email,password} = req.body;
-
-        const user = await User.create({
-            username:username.trim(),
-            email:email.toLowerCase().trim(),
-            password
-        });
-        res.status(201).json({
-            message: 'Registration successful',
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email
-            }
-        });
-    } catch (error) {
+  } catch (error) {
         console.error(' Registration error:', error);
         if (error.message.includes('Username already exists')) {
             return res.status(409).json({

@@ -44,9 +44,8 @@ const Dashboard = () => {
         teamService.getUserTeams(),
         taskService.getMyTasks()
       ])
-
       setTeams(teamsData.teams || [])
-
+      console.log('Task Data: ', tasksData);
       const tasks = tasksData.tasks || []
       setRecentTasks(tasks.slice(0, 5))
 
@@ -56,7 +55,7 @@ const Dashboard = () => {
         pendingTasks: tasks.filter(task => task.status === 'PENDING').length,
         totalTeams: teamsData.teams?.length || 0
       })
-
+      console.log('Stats: ',stats.totalTasks);
     } catch (error) {
       toast.error('Failed to load dashboard data:', error)
     } finally {

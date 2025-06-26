@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Search, Plus, User, LogOut, Users, CheckSquare, Menu, X } from 'lucide-react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Search, Plus, User, LogOut, Users, CheckSquare, Menu, X, ChevronRight, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { UserAvatar } from '@/components/ui/avatar'
@@ -38,11 +38,44 @@ const Header = () => {
   }
 
   const isActivePage = (path) => {
+    if (path === '/teams' && location.pathname.startsWith('/teams')) {
+      return true
+    }
     return location.pathname === path
   }
 
+  const getBreadcrumbs = () => {
+    const pathSegments = location.pathname.split('/').filter(Boolean)
+    const breadcrumbs = []
+
+    if (pathSegments.length === 0 || pathSegments[0] === 'dashboard') {
+      return [{ label: 'Dashboard', path: '/dashboard', icon: Home }]
+    }
+
+    breadcrumbs.push({ label: 'Dashboard', path: '/dashboard', icon: Home })
+
+    if (pathSegments[0] === 'teams') {
+      breadcrumbs.push({ label: 'Teams', path: '/teams', icon: Users })
+      
+      if (pathSegments[1] && pathSegments[1] !== '') {
+        breadcrumbs.push({ 
+          label: `Team Details`, 
+          path: `/teams/${pathSegments[1]}`,
+          icon: Users,
+          isActive: true 
+        })
+      }
+    } else if (pathSegments[0] === 'tasks') {
+      breadcrumbs.push({ label: 'Tasks', path: '/tasks', icon: CheckSquare, isActive: true })
+    }
+
+    return breadcrumbs
+  }
+
+  const breadcrumbs = getBreadcrumbs()
+
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: CheckSquare },
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/teams', label: 'Teams', icon: Users },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare }
   ]
@@ -134,6 +167,33 @@ const Header = () => {
             </Button>
           </div>
         </div>
+
+        {breadcrumbs.length > 1 && (
+          <div className="flex items-center space-x-1 py-2 text-sm text-gray-500 overflow-x-auto">
+            {breadcrumbs.map((crumb, index) => {
+              const Icon = crumb.icon
+              const isLast = index === breadcrumbs.length - 1
+              
+              return (
+                <div key={crumb.path} className="flex items-center space-x-1 shrink-0">
+                  {index > 0 && <ChevronRight className="h-4 w-4 text-gray-400" />}
+                  <Link
+                    to={crumb.path}
+                    className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-colors ${
+                      isLast || crumb.isActive
+                        ? 'text-blue-600 bg-blue-50' 
+                        : 'hover:text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{crumb.label}</span>
+                  </Link>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4 space-y-4">
             <form onSubmit={handleSearch} className="px-2">
@@ -148,6 +208,7 @@ const Header = () => {
                 />
               </div>
             </form>
+            
             <nav className="px-2 space-y-2">
               {navItems.map((item) => {
                 const Icon = item.icon
@@ -168,6 +229,7 @@ const Header = () => {
                 )
               })}
             </nav>
+            
             <div className="px-2">
               <Button 
                 onClick={() => {

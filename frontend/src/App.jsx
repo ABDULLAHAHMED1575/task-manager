@@ -4,6 +4,7 @@ import { ToastProvider } from '@/components/ui/toast'
 import Login from '@/pages/Login'
 import Teams from '@/pages/Teams'
 import Tasks from '@/pages/Tasks'
+import TeamDetailView from '@/components/teams/TeamDetailView'
 import Layout from '@/components/layout/MainLayout'
 import useAuth from '@/hooks/useAuth'
 import { LoadingScreen } from '@/components/ui/loading'
@@ -59,7 +60,7 @@ const AppRoutes = () => {
         } 
       />
       
-       <Route 
+      <Route 
         path="/dashboard" 
         element={
           <ProtectedRoute>
@@ -73,6 +74,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Teams />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/teams/:teamId" 
+        element={
+          <ProtectedRoute>
+            <TeamDetailView />
           </ProtectedRoute>
         } 
       />

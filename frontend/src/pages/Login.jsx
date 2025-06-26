@@ -4,11 +4,12 @@ import LoginForm from '@/components/auth/LoginForm'
 import { LoadingScreen } from '@/components/ui/loading'
 import useAuth from '@/hooks/useAuth'
 import { CheckSquare } from 'lucide-react'
+import { useToast } from '@/components/ui/toast'
 
 const Login = () => {
   const navigate = useNavigate()
   const { isAuthenticated, loading } = useAuth()
-
+  const toast = useToast();
   useEffect(() => {
     if (!loading && isAuthenticated) {
       navigate('/dashboard')
@@ -16,6 +17,7 @@ const Login = () => {
   }, [isAuthenticated, loading, navigate])
 
   const handleLoginSuccess = () => {
+    toast.success("Login successfull")
     navigate('/dashboard')
   }
 

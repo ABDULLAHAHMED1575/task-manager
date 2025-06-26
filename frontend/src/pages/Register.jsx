@@ -1,20 +1,16 @@
-import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import RegisterForm from '@/components/auth/RegisterForm'
 import { LoadingScreen } from '@/components/ui/loading'
 import useAuth from '@/hooks/useAuth'
 import { CheckSquare } from 'lucide-react'
+import { useToast } from '@/components/ui/toast'
 
 const Register = () => {
   const navigate = useNavigate()
-  const { isAuthenticated, loading } = useAuth()
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate('/dashboard')
-    }
-  }, [isAuthenticated, loading, navigate])
-
+  const { loading } = useAuth()
+  const toast = useToast();
   const handleRegisterSuccess = () => {
+    toast.success('Registered successfully')
     navigate('/login')
   }
 

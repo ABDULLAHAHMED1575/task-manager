@@ -1,6 +1,7 @@
 const Team = require('../models/teams')
 const Membership = require("../models/membership")
 const { validationResult } = require('express-validator');
+const User = require('../models/user')
 
 const createTeam = async (req,res) => {
     try{
@@ -160,42 +161,78 @@ const deleteTeam = async (req,res) => {
 };
 
 const addMember = async (req, res) => {
-    try {
-        const { teamId } = req.params;
-        const { userId } = req.body;
+  try {
+    console.log('Add member request:', { params: req.params, body: req.body });
+    
+    const { teamId } = req.params;
+    const { userId, email } = req.body;
 
-        if (!userId) {
-            return res.status(400).json({
-                error: 'User ID is required'
-            });
-        }
-
-        const membership = await Team.addMember(teamId, userId);
-
-        res.status(201).json({
-            message: 'Member added successfully',
-            membership: membership
-        });
-
-    } catch (error) {
-        console.error('Add member error:', error);
-        
-        if (error.message.includes('already a member')) {
-            return res.status(409).json({
-                error: 'User is already a member of this team'
-            });
-        }
-
-        if (error.message.includes('Invalid')) {
-            return res.status(400).json({
-                error: 'Invalid user or team ID'
-            });
-        }
-
-        res.status(500).json({
-            error: 'Failed to add member'
-        });
+    const teamIdNum = parseInt(teamId);
+    if (!teamIdNum || isNaN(teamIdNum)) {
+      return res.status(400).json({
+        error: 'Invalid team ID'
+      });
     }
+
+    let memberUserId = userId;
+
+    if (!memberUserId && email) {
+      console.log('Looking up user by email:', email);
+      
+      const user = await User.findByEmail(email.toLowerCase().trim());
+      if (!user) {
+        return res.status(404).json({
+          error: 'User not found',
+          message: 'No user found with that email address'
+        });
+      }
+      memberUserId = user.id;
+      console.log('Found user:', { id: user.id, username: user.username });
+    }
+
+    if (!memberUserId) {
+      return res.status(400).json({
+        error: 'User ID or email is required'
+      });
+    }
+
+    console.log('Checking if user is already member:', { userId: memberUserId, teamId: teamIdNum });
+    const existingMember = await Membership.exists(memberUserId, teamIdNum);
+    
+    if (existingMember) {
+      return res.status(409).json({
+        error: 'User is already a member of this team'
+      });
+    }
+    console.log('Adding member to team:', { userId: memberUserId, teamId: teamIdNum });
+    const membership = await Membership.create(memberUserId, teamIdNum);
+    console.log('Membership created:', membership);
+
+    res.status(201).json({
+      message: 'Member added successfully',
+      membership: membership
+    });
+
+  } catch (error) {
+    console.error('Add member error:', error);
+    
+    if (error.code === '23505') {
+      return res.status(409).json({
+        error: 'User is already a member of this team'
+      });
+    }
+    
+    if (error.code === '23503') {
+      return res.status(400).json({
+        error: 'Invalid user or team ID'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Failed to add member',
+      message: error.message
+    });
+  }
 };
 
 const removeMember = async (req, res) => {
