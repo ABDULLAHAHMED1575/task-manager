@@ -7,6 +7,8 @@ const {setupPassport} = require('./middleware/passportMiddleware')
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cors({
     origin:CORSORIGIN,
     optionsSuccessStatus: 200,
