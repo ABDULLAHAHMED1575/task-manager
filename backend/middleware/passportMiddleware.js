@@ -30,7 +30,7 @@ const sessionConfig = {
         secure: config.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
+        sameSite: config.NODE_ENV === 'production' ? 'lax' : 'lax',
     }
 };
 
