@@ -71,8 +71,34 @@ const Teams = () => {
     try {
       setLoading(true)
       const response = await teamService.getUserTeams()
-      setTeams(response.teams || [])
+      
+      const teamsWithStats = await Promise.all(
+        (response.teams || []).map(async (team) => {
+          try {
+            const teamDetails = await teamService.getTeamById(team.id)
+            return {
+              ...team,
+              member_count: teamDetails.team?.member_count || 0,
+              total_tasks: teamDetails.team?.total_tasks || 0,
+              completed_tasks: teamDetails.team?.completed_tasks || 0,
+              pending_tasks: teamDetails.team?.pending_tasks || 0
+            }
+          } catch (error) {
+            console.error(`Failed to load stats for team ${team.id}:`, error)
+            return {
+              ...team,
+              member_count: 0,
+              total_tasks: 0,
+              completed_tasks: 0,
+              pending_tasks: 0
+            }
+          }
+        })
+      )
+      
+      setTeams(teamsWithStats)
     } catch (error) {
+      console.error('Failed to load teams:', error)
       toast.error('Failed to load teams')
     } finally {
       setLoading(false)
@@ -134,6 +160,8 @@ const Teams = () => {
       setIsModalOpen(false)
       setEditingTeam(null)
     } catch (error) {
+      console.error('Failed to save team:', error)
+      toast.error('Failed to save team')
       throw error
     } finally {
       setIsCreating(false)
@@ -150,6 +178,7 @@ const Teams = () => {
       setTeams(prev => prev.filter(team => team.id !== teamId))
       toast.success('Team deleted successfully!')
     } catch (error) {
+      console.error('Failed to delete team:', error)
       toast.error('Failed to delete team')
     }
   }
@@ -160,6 +189,7 @@ const Teams = () => {
       setSelectedTeam(response.team)
       setShowMembers(true)
     } catch (error) {
+      console.error('Failed to load team details:', error)
       toast.error('Failed to load team details')
     }
   }
@@ -169,39 +199,29 @@ const Teams = () => {
   }
 
   const handleAddMember = async (email) => {
-  if (!selectedTeam) return;
+    if (!selectedTeam) return
 
-  try {
-    await teamService.addMember(selectedTeam.id, { email });
-    
-    const [teamResponse, membersResponse] = await Promise.all([
-      teamService.getTeamById(selectedTeam.id),
-      teamService.getTeamMembers(selectedTeam.id)
-    ]);
-    
-    setSelectedTeam({
-      ...teamResponse.team,
-      members: membersResponse.members || []
-    });
-    
-    setTeams(prev =>
-      prev.map(team =>
-        team.id === selectedTeam.id 
-          ? { 
-              ...team, 
-              member_count: membersResponse.members?.length || 0
-            }
-          : team
+    try {
+      await teamService.addMember(selectedTeam.id, { email })
+      
+      const response = await teamService.getTeamById(selectedTeam.id)
+      setSelectedTeam(response.team)
+      
+      setTeams(prev =>
+        prev.map(team =>
+          team.id === selectedTeam.id 
+            ? { ...team, member_count: response.team.member_count }
+            : team
+        )
       )
-    );
-    
-    toast.success('Member added successfully!');
-  } catch (error) {
-    console.error('Failed to add member:', error);
-    toast.error(error.message || 'Failed to add member');
-    throw error;
+      
+      toast.success('Member added successfully!')
+    } catch (error) {
+      console.error('Failed to add member:', error)
+      toast.error(error.message || 'Failed to add member')
+      throw error
+    }
   }
-};
 
   const handleRemoveMember = async (memberId) => {
     try {
@@ -213,7 +233,10 @@ const Teams = () => {
           team.id === selectedTeam.id ? { ...team, member_count: response.team.member_count } : team
         )
       )
+      toast.success('Member removed successfully!')
     } catch (error) {
+      console.error('Failed to remove member:', error)
+      toast.error('Failed to remove member')
       throw error
     }
   }
@@ -232,6 +255,9 @@ const Teams = () => {
     if (!team.total_tasks || team.total_tasks === 0) return 0
     return Math.round((team.completed_tasks / team.total_tasks) * 100)
   }
+
+  const totalMembers = teams.reduce((sum, team) => sum + (team.member_count || 0), 0)
+  const totalTasks = teams.reduce((sum, team) => sum + (team.total_tasks || 0), 0)
 
   if (loading) {
     return <LoadingPage text="Loading teams..." />
@@ -287,9 +313,7 @@ const Teams = () => {
             <UserPlus className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {teams.reduce((sum, team) => sum + (team.member_count || 0), 0)}
-            </div>
+            <div className="text-2xl font-bold text-green-600">{totalMembers}</div>
             <p className="text-xs text-gray-500">
               Across all teams
             </p>
@@ -304,9 +328,7 @@ const Teams = () => {
             <CheckSquare className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-              {teams.reduce((sum, team) => sum + (team.total_tasks || 0), 0)}
-            </div>
+            <div className="text-2xl font-bold text-purple-600">{totalTasks}</div>
             <p className="text-xs text-gray-500">
               Active tasks
             </p>

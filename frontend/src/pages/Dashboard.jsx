@@ -24,10 +24,12 @@ const Dashboard = () => {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
-    totalTasks: 0,
-    completedTasks: 0,
-    pendingTasks: 0,
-    totalTeams: 0
+    myTasks: 0,
+    myCompletedTasks: 0,
+    myPendingTasks: 0,
+    totalTeams: 0,
+    totalTeamTasks: 0,
+    totalTeamCompletedTasks: 0
   })
   const [recentTasks, setRecentTasks] = useState([])
   const [teams, setTeams] = useState([])
@@ -40,24 +42,53 @@ const Dashboard = () => {
     try {
       setLoading(true)
       
-      const [teamsData, tasksData] = await Promise.all([
-        teamService.getUserTeams(),
-        taskService.getMyTasks()
-      ])
-      setTeams(teamsData.teams || [])
-      console.log('Task Data: ', tasksData);
-      const tasks = tasksData.tasks || []
-      setRecentTasks(tasks.slice(0, 5))
+      const teamsResponse = await teamService.getUserTeams()
+      const userTeams = teamsResponse.teams || []
+      
+      const teamsWithStats = await Promise.all(
+        userTeams.map(async (team) => {
+          try {
+            const teamDetails = await teamService.getTeamById(team.id)
+            return {
+              ...team,
+              member_count: teamDetails.team?.member_count || 0,
+              total_tasks: teamDetails.team?.total_tasks || 0,
+              completed_tasks: teamDetails.team?.completed_tasks || 0,
+              pending_tasks: teamDetails.team?.pending_tasks || 0
+            }
+          } catch (error) {
+            return {
+              ...team,
+              member_count: 0,
+              total_tasks: 0,
+              completed_tasks: 0,
+              pending_tasks: 0
+            }
+          }
+        })
+      )
+      
+      setTeams(teamsWithStats)
+
+      const myTasksResponse = await taskService.getMyTasks()
+      const myTasks = myTasksResponse.tasks || []
+      setRecentTasks(myTasks.slice(0, 5))
+
+      const totalTeamTasks = teamsWithStats.reduce((sum, team) => sum + (team.total_tasks || 0), 0)
+      const totalTeamCompletedTasks = teamsWithStats.reduce((sum, team) => sum + (team.completed_tasks || 0), 0)
 
       setStats({
-        totalTasks: tasks.length,
-        completedTasks: tasks.filter(task => task.status === 'COMPLETED').length,
-        pendingTasks: tasks.filter(task => task.status === 'PENDING').length,
-        totalTeams: teamsData.teams?.length || 0
+        myTasks: myTasks.length,
+        myCompletedTasks: myTasks.filter(task => task.status === 'COMPLETED').length,
+        myPendingTasks: myTasks.filter(task => task.status === 'PENDING').length,
+        totalTeams: teamsWithStats.length,
+        totalTeamTasks,
+        totalTeamCompletedTasks
       })
-      console.log('Stats: ',stats.totalTasks);
+
     } catch (error) {
-      toast.error('Failed to load dashboard data:', error)
+      console.error('Failed to load dashboard data:', error)
+      toast.error('Failed to load dashboard data')
     } finally {
       setLoading(false)
     }
@@ -66,6 +97,9 @@ const Dashboard = () => {
   if (loading) {
     return <LoadingPage text="Loading dashboard..." />
   }
+
+  const myCompletionRate = stats.myTasks > 0 ? Math.round((stats.myCompletedTasks / stats.myTasks) * 100) : 0
+  const teamCompletionRate = stats.totalTeamTasks > 0 ? Math.round((stats.totalTeamCompletedTasks / stats.totalTeamTasks) * 100) : 0
 
   return (
     <div className="space-y-6">
@@ -92,18 +126,19 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Total Tasks
+              My Tasks
             </CardTitle>
             <CheckSquare className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTasks}</div>
+            <div className="text-2xl font-bold">{stats.myTasks}</div>
             <p className="text-xs text-gray-500">
-              Across all teams
+              Tasks assigned to me
             </p>
           </CardContent>
         </Card>
@@ -111,14 +146,14 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Completed
+              My Completed
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.completedTasks}</div>
+            <div className="text-2xl font-bold text-green-600">{stats.myCompletedTasks}</div>
             <p className="text-xs text-gray-500">
-              {stats.totalTasks > 0 ? Math.round((stats.completedTasks / stats.totalTasks) * 100) : 0}% completion rate
+              {myCompletionRate}% of my tasks done
             </p>
           </CardContent>
         </Card>
@@ -126,14 +161,14 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Pending
+              My Pending
             </CardTitle>
             <Clock className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.pendingTasks}</div>
+            <div className="text-2xl font-bold text-orange-600">{stats.myPendingTasks}</div>
             <p className="text-xs text-gray-500">
-              Need attention
+              Need my attention
             </p>
           </CardContent>
         </Card>
@@ -153,12 +188,36 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {stats.totalTeamTasks > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Team Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{stats.totalTeamTasks}</div>
+                <p className="text-sm text-gray-600">Total Team Tasks</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{stats.totalTeamCompletedTasks}</div>
+                <p className="text-sm text-gray-600">Completed</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">{teamCompletionRate}%</div>
+                <p className="text-sm text-gray-600">Team Progress</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold">Recent Tasks</CardTitle>
+              <CardTitle className="text-lg font-semibold">My Recent Tasks</CardTitle>
               <Link to="/tasks">
                 <Button variant="ghost" size="sm">
                   View All
@@ -170,7 +229,7 @@ const Dashboard = () => {
               {recentTasks.length === 0 ? (
                 <div className="text-center py-8">
                   <CheckSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No tasks yet</p>
+                  <p className="text-gray-500 mb-4">No tasks assigned to you yet</p>
                   <Link to="/tasks?create=true">
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
@@ -199,14 +258,6 @@ const Dashboard = () => {
                           )}
                         </div>
                       </div>
-                      {task.assigned_to_username && (
-                        <div className="ml-4">
-                          <UserAvatar 
-                            user={{ username: task.assigned_to_username }} 
-                            size="sm" 
-                          />
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -214,10 +265,11 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
         <div>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold">Your Teams</CardTitle>
+              <CardTitle className="text-lg font-semibold">My Teams</CardTitle>
               <Link to="/teams">
                 <Button variant="ghost" size="sm">
                   View All

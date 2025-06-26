@@ -127,7 +127,7 @@ const TeamCard = ({
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-blue-600">
               <CheckSquare className="h-4 w-4" />
-              <span className="font-semibold">{team.total_tasks || 0}</span>
+              <span className="font-semibold">{team.total_tasks}</span>
             </div>
             <p className="text-xs text-gray-500">Total Tasks</p>
           </div>
