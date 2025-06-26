@@ -17,7 +17,7 @@ const sessionConfig = {
         pool: pgPool,
         tableName: 'session',
         createTableIfMissing: true,
-        ttl: 1 * 60 * 60,
+        ttl: 24 * 60 * 60,
         disableTouch: false,
         schemaName: 'public',
     }),
@@ -29,8 +29,8 @@ const sessionConfig = {
     cookie: {
         secure: config.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 1 * 60 * 60 * 1000,
-        sameSite: config.NODE_ENV === 'production' ? 'strict' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
     }
 };
 
