@@ -1,7 +1,7 @@
 import api from "./api";
 
 export const taskService =  {
-    getAllTask: async (filters = {}) => {
+    getAllTasks: async (filters = {}) => {
         try {
             const params = new URLSearchParams(filters);
             const response = await api.get(`/tasks?${params}`);
@@ -10,7 +10,7 @@ export const taskService =  {
             throw error;
         }
     },
-    getMyTask: async (filters = {}) => {
+    getMyTasks: async (filters = {}) => {
         try {
             const params = new URLSearchParams(filters);
             const response = await api.get(`/tasks/my-tasks?${params}`);

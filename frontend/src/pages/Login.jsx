@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoginForm from '@/components/auth/LoginForm'
-import RegisterForm from '@/components/auth/RegisterForm'
 import { LoadingScreen } from '@/components/ui/loading'
 import useAuth from '@/hooks/useAuth'
 import { CheckSquare } from 'lucide-react'

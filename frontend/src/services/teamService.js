@@ -1,9 +1,9 @@
 import api from "./api";
 
 export const teamService = {
-    getUserTeams:async () => {
+    getUserTeams: async () => {
         try {
-            const response = await api.get('/team');
+            const response = await api.get('/teams');
             return response.data;
         } catch (error) {
             throw error;
@@ -11,31 +11,31 @@ export const teamService = {
     },
     createTeam: async (teamData) => {
         try {
-            const response = await api.post('/teamCreate',teamData);
+            const response = await api.post('/teamCreate', teamData);
             return response.data;
         } catch (error) {
             throw error;
         }
     },
-    getTeamById:async (teamId) => {
+    getTeamById: async (teamId) => {
         try {
-            const response = await api.get(`/team/${teamId}`);
+            const response = await api.get(`/teams/${teamId}`);
             return response.data;
         } catch (error) {
             throw error;
         }
     },
-    updateTeam:async (teamId,updates) => {
+    updateTeam: async (teamId, updates) => {
         try {
-            const response = await api.put(`/teams/${teamId}`,updates);
+            const response = await api.put(`/teams/${teamId}`, updates);
             return response.data;
         } catch (error) {
             throw error;
         }
     },
-    deleteTeam : async (teamId) => {
+    deleteTeam: async (teamId) => {
         try {
-            const response = await api.delete(`/team/${teamId}`);
+            const response = await api.delete(`/teams/${teamId}`);
             return response.data;
         } catch (error) {
             throw error;            
@@ -43,7 +43,7 @@ export const teamService = {
     },
     addMember: async (teamId, userId) => {
         try {
-            const response = await api.post(`/teams/${teamId}/members`,{userId});
+            const response = await api.post(`/teams/${teamId}/members`, { userId });
             return response.data;
         } catch (error) {
             throw error;
@@ -65,4 +65,21 @@ export const teamService = {
             throw error;
         }
     },
+    getTeamStatistics: async (teamId) => {
+        try {
+            const response = await api.get(`/teams/${teamId}/statistics`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+    getTeamTasks: async (teamId, filters = {}) => {
+        try {
+            const params = new URLSearchParams(filters);
+            const response = await api.get(`/teams/${teamId}/tasks?${params}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

@@ -48,7 +48,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-none">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">
             Create Account

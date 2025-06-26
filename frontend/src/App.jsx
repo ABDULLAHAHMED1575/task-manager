@@ -2,13 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from '@/context/AuthContext'
 import { ToastProvider } from '@/components/ui/toast'
 import Login from '@/pages/Login'
-import Dashboard from '@/pages/Dashboard'
 import Teams from '@/pages/Teams'
 import Tasks from '@/pages/Tasks'
 import Layout from '@/components/layout/MainLayout'
 import useAuth from '@/hooks/useAuth'
 import { LoadingScreen } from '@/components/ui/loading'
 import Register from '@/pages/Register'
+import Dashboard from './pages/Dashboard'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth()

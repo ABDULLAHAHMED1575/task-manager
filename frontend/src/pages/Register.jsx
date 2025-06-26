@@ -8,11 +8,11 @@ import { CheckSquare } from 'lucide-react'
 const Register = () => {
   const navigate = useNavigate()
   const { isAuthenticated, loading } = useAuth()
-//   useEffect(() => {
-//     if (!loading && isAuthenticated) {
-//       navigate('/dashboard')
-//     }
-//   }, [isAuthenticated, loading, navigate])
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate('/dashboard')
+    }
+  }, [isAuthenticated, loading, navigate])
 
   const handleRegisterSuccess = () => {
     navigate('/login')
@@ -22,9 +22,9 @@ const Register = () => {
     navigate('/login')
   }
 
-//   if (loading) {
-//     return <LoadingScreen text="Checking authentication..." />
-//   }
+  if (loading) {
+    return <LoadingScreen text="Checking authentication..." />
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
