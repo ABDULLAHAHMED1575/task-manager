@@ -1,23 +1,27 @@
+# This file has been moved to k8s/frontend-deployment.yaml
+# Please use the manifests in the k8s/ directory
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: react-deployment
+  name: frontend-deployment
 spec:
   selector:
     matchLabels:
-      app: react
+      app: frontend
   replicas: 2
-
   template:
     metadata:
       labels:
-        app: react
+        app: frontend
     spec:
       containers:
-        - name: taskmanager-react
-          image: taskmanager-react:latest
+        - name: taskmanager-frontend
+          image: taskmanager-frontend:latest
           ports:
             - containerPort: 80
           env:
             - name: VITE_API_URL
-              value: "http://"
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: VITE_API_URL
