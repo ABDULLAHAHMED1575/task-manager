@@ -4,9 +4,7 @@ module.exports = {
     client: 'pg',
     connection: {
       connectionString: config.DB_URI,
-      ssl: {
-        rejectUnauthorized: false, 
-      },
+      ssl: false,
     },
     migrations: {
       tableName: 'taskmanager_3iih',
@@ -17,9 +15,7 @@ module.exports = {
     client: 'pg',
     connection: {
       connectionString: config.DB_URI,
-      ssl: {
-        rejectUnauthorized: false, 
-      },
+      ssl: false,
     },
     pool: {
       min: 2,
@@ -34,9 +30,7 @@ module.exports = {
     client: 'pg',
     connection: {
       connectionString: config.DB_URI,
-      ssl: {
-        rejectUnauthorized: false, 
-      },
+      ssl: false,
     },
     pool: {
       min: 2,

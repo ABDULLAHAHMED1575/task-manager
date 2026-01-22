@@ -5,11 +5,11 @@ const config = require('../core/config');
 const passport = require('../core/passport');
 const { Pool } = require('pg');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const pgPool = new Pool({
   connectionString: config.DB_URI,
-  ssl: {
-    rejectUnauthorized: false,
-  }
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
 const sessionConfig = {
@@ -22,15 +22,15 @@ const sessionConfig = {
         schemaName: 'public',
     }),
     name: 'team_task_sid',
-    secret: process.env.SECRET_SESSION_KEY,
+    secret: process.env.SECRET_SESSION_KEY || 'dev-secret',
     resave: false,
     saveUninitialized: false,
     rolling: true,
     cookie: {
-        secure: true,
+        secure: isProduction,
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'none',
+        sameSite: isProduction ? 'none' : 'lax',
     }
 };
 
