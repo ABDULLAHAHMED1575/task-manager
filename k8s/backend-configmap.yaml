@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: default
+data:
+  PORT: "3000"
+  HOST: "0.0.0.0"
+  NODE_ENV: "production"
+  BCRYPT_ROUNDS: "10"
+  CORSORIGIN: "http://taskmanager.local"  # Update this based on your ingress host

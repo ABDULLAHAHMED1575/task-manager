@@ -1,2 +1,4 @@
-apiVersion: apps/v1
-kind: configMap
+# ⚠️  DEPRECATED - This file has been moved
+# Please use k8s/frontend-configmap.yaml
+#
+# For complete deployment instructions, see k8s/README.md
